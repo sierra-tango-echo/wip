@@ -1,0 +1,3 @@
+---
+hostname_range: login[01-02]
+role: login

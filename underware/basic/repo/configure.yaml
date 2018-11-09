@@ -1,0 +1,40 @@
+
+questions:
+  - &cluster
+    identifier: cluster
+    question: "Name of the cluster"
+    default: mycluster
+
+  - &hostname_range
+    identifier: hostname_range
+    question: "Genders compatable hostname range"
+    default: "node[01-10]"
+
+  - &role
+    identifier: role
+    question: "Role"
+    choices:
+      - 'service'
+      - 'login'
+      - 'compute'
+      - 'storage'
+      - 'other'
+    default: 'other'
+
+  - &secondary_groups
+    identifier: secondary_groups
+    question: "Secondary groups"
+    default: "<%= config.cluster %>,all"
+
+domain:
+    - *cluster
+
+group:
+    - *hostname_range
+    - *role
+    - *secondary_groups
+
+node: []
+
+local: []
+

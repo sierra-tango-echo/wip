@@ -1,0 +1,64 @@
+
+questions:
+
+  #BASE
+  - &cluster
+    identifier: cluster
+    question: "Name of the cluster"
+    default: mycluster
+  - &hostname_range
+    identifier: hostname_range
+    question: "Genders compatable hostname range"
+    default: "node[01-10]"
+  - &role
+    identifier: role
+    question: "Role"
+    choices:
+      - 'service'
+      - 'login'
+      - 'compute'
+      - 'storage'
+      - 'other'
+    default: 'other'
+  - &secondary_groups
+    identifier: secondary_groups
+    question: "Secondary groups"
+    default: "<%= config.cluster %>,all"
+  #####
+  #NETWORK
+  - &domainname
+    identifier: domainname
+    question: 'Fully-qualified domain name for cluster nodes'
+    default: '<%= domain.config.cluster %>.cluster.local'
+  - &networkpolicy
+    identifier: networkpolicy
+    question: 'Network Policy selection'
+    default: "deployment_only"
+    choices:
+      - 'deployment_only'
+      - 'deployment_and_management'
+      - 'deployment_management_and_highperformance'
+  - &ipmipassword
+    identifier: ipmipassword
+    question: 'Default IPMI password'
+    default: 'Pa55W0rd'
+  ####
+
+domain:
+  #BASE
+  - *cluster
+  #NETWORK
+  - *domainname
+  - <<: *networkpolicy
+    dependent: 
+    - *ipmipassword
+group:
+  #BASE
+  - *hostname_range
+  - *role
+  - *secondary_groups
+  #####
+node: []
+
+local: []
+

@@ -1,0 +1,26 @@
+{
+ "v1": {
+  "datasource": "DataSourceNoCloud [seed=/dev/sr0][dsmode=local]", 
+  "init": {
+   "errors": [], 
+   "finished": 1541775500.567016, 
+   "start": 1541775500.482382
+  }, 
+  "init-local": {
+   "errors": [], 
+   "finished": 1541775497.539903, 
+   "start": 1541775497.206141
+  }, 
+  "modules-config": {
+   "errors": [], 
+   "finished": 1541775500.950788, 
+   "start": 1541775500.876827
+  }, 
+  "modules-final": {
+   "errors": [], 
+   "finished": 1541775501.211169, 
+   "start": 1541775501.145585
+  }, 
+  "stage": null
+ }
+}

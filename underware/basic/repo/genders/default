@@ -1,0 +1,7 @@
+<% groups.each do |group| -%>
+<% next if group.name == 'orphan' -%>
+<%= group.answer.hostname_range %>    <%= group.name %>,<%= group.answer.role %><%= ",#{group.answer.secondary_groups}" rescue nil  %>
+<% end -%>
+<% orphan_list.each do |node| -%>
+<%= node %>    orphan
+<% end -%>
