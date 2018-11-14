@@ -58,9 +58,45 @@ networks:
 
 role: '<%=answer.role%>'
 
+
+debug: true
 platform: aws
 renderedurl: https://s3-eu-west-1.amazonaws.com/stevenorledge/rendered/<%=config.platform%>/<%=node.name%>/
 nodescripturl: <%= config.renderedurl %>deployment/main.sh
+
+# SHA512 - generate with `python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())'`
+rootpw: $6$4nGtQTx8OApHDlaR$AtoY1iyieO7.jlyPYuq4YMI/QeBQFVWS/VT.hiCFmff3UkalLLwRh2.hrjuQ0v5dX2jivKntLHMwqvbmPy2BM.
+
+privatekey: |
+  -----BEGIN RSA PRIVATE KEY-----
+  MIIEpAIBAAKCAQEArT0I9vGv90JPeVz0fUwm/YxwGShwZppM6uEfPGn/VbPtHcLE
+  GPsqaImAGgwQFfl1COf8sXpbPFxL4XAnBNDxD+FE/SCOQV8Teps0uca5bkQ5kjP9
+  7ODW1T87oRCKt1KzbpN1oedH+tTMZ3bACC0Z5EmyXY0KdTeZ/Njz0XJdaeEJvsrH
+  D0lktGEAqpaSABVYcUskyT7yZZ+bA+Lf4/ynVhV9z4h3A4XP5y49lx/WI35Y7vse
+  0bNRkcSzFXdw/IacoE633+PhuNZFmU4eJ21YwZ8lGoVAwphs0ZmgZcUK6QTWVRlR
+  WPQZYxGP73OMJnWFNhJFaEZGjWbawz5RKOQPcQIDAQABAoIBACCDcAdI3Qm+/EN+
+  2rQZcsfrb66JFG9tTjpW/hHMowtmtX38a+l0WkU8aTp6QRqeswR05cw5dp4hhGxP
+  LEOPI28jjFslnQ1P1swQDRlA3tR/IX77GxE2MZvcPkjAXgiCEQMT0eQNEElXXvWc
+  J/Zg4Jcj7cH5EpllUhVOcpRArp+MOXwgsnVoogxqR+H6hTgzPs044KP092odXTIJ
+  cCYEo4uNbWlWNOYF/GpjDGYxC4ZGP86DKx9dvjLqz4XUKAxzqpxT1HOfvwdDt383
+  SJeEP2zScWdrxzMeY/usPPmVwXt7TnKN3hc2jMezQQsXW1hP0P/y7l+q36yaTFee
+  c4iUH0ECgYEA5Y8MvyVgIuyHWQwVgCgrkHK55HA0T8oERM3u8Woz9dI1XulUJ8EL
+  EZ8CcrwRNe56qFaUm5g5DlGbVNF2Uc49kO7iNrZzEPSU3qAXbLi4oXR99Wxsi9+d
+  75r7cDAXMEQh4ZUScmQCvg7/tjraVj1OvQsXdD0VxXz9RVinrAI1JL0CgYEAwTFH
+  V8q15tj+R4p5Qr0t/ERW2ljCIsB4opC53AFNSAfkmKOxpAFmS7gn/PKWX8i/9m2M
+  BnXROn7UUS6IM2X8o8tuUeLWvnjFodraHu8QJhZk6DYFwPsr9aLXSSW4nO23NWXx
+  C6QCLH5xvcRodRsewy16j4MT4RCJswOhfEtnksUCgYAM8xnj+obG0ZL9Cfp4hUuX
+  1XD5Gv9IdPvyqa9N/RC7UEVkekMeDvzB3Ld1o3hRE4fl0SSG9npZfW8GxN4o1TqR
+  33fxYC9ziGiRenR31J/Ns9WbL6eb6FxvdM20UXItbdp/cDpfK5cgA5aXQBCrBsBX
+  V7XV/9AnmNpsvAiRYnp+/QKBgQCywodSG7a++TAoQGA9udDwKMf418Ii59d4DNR9
+  VxMMQIlsF6OKruTZ0Xfm3Qz5akb9nZXAcIn+R1bsG1NZw9fGM7lLucqciiHMxzWn
+  A+v8YiJSn5IpY//kFR6Bh47QXkF0/nPRIpwEUaerQS6qlUKctNtAKbheO7A+XXCy
+  Ew+uRQKBgQCsm3sQO39vPhBNQyT6aJyI/U/Tpbm+qVYZ8N1o4+TbsswoWHSUfKQi
+  qzeD8sqRSrP6W8tk8l+OoG+WuAevpU5itjAseHiTbmT7yE3T/TtT12JTgPpIP1OY
+  S6kRdR4lYvh0EZamGDtt/Kz2uHdOJdHJyM1qAnu8fdZbogReFexXPw==
+  -----END RSA PRIVATE KEY-----
+
+publickey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtPQj28a/3Qk95XPR9TCb9jHAZKHBmmkzq4R88af9Vs+0dwsQY+ypoiYAaDBAV+XUI5/yxels8XEvhcCcE0PEP4UT9II5BXxN6mzS5xrluRDmSM/3s4NbVPzuhEIq3UrNuk3Wh50f61MxndsAILRnkSbJdjQp1N5n82PPRcl1p4Qm+yscPSWS0YQCqlpIAFVhxSyTJPvJln5sD4t/j/KdWFX3PiHcDhc/nLj2XH9Yjflju+x7Rs1GRxLMVd3D8hpygTrff4+G41kWZTh4nbVjBnyUahUDCmGzRmaBlxQrpBNZVGVFY9BljEY/vc4wmdYU2EkVoRkaNZtrDPlEo5A9x
 
 #EXAMPLE COMPLEX
 #networks:
