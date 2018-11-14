@@ -1,140 +1,93 @@
-#BASE
-cluster: '<%= answer.cluster %>'
+debug: true
 
-#NETWORK
-domainname: '<%= answer.domainname %>'
+#
+# BASE
+#
+cluster: '<%= answer.cluster_name %>'
+root_password: '<%= answer.root_password %>'
+publickey: '<%= answer.publickey %>'
+privatekey: |
+  ----BEGIN RSA PRIVATE KEY-----
+  MIIEowIBAAKCAQEA5DZT7fz8lnDsOwmleOLIuUWMTu/v4XCDyI64MEJsct1ZnTtm
+  XoGIpDdbqlyox2ZPUNCqF1rZMZpyQ8DIRHZc2r4QhG88wKbac9NCbi0sMFhnlr4e
+  Bon5GrJuTADJtfb8dy0J/kZ/hxpcxww81Ca/R5P1UBGqyoAQaPEDYHDAOUwgsj8d
+  hRg8SHynR7bSLz8IvgRe+8pb5tskEDHxnXyvCByRbQQBogB42+9UrLHj9cmJ9h5d
+  I0h7q4trKfib7EtDioUviJvo6J8/018QnUfJimd18q6rVcoRK4cFUiHxAoABafvB
+  UJSLyv2eW8w1baqejqXItFDNwktT+H6P7ixMEQIDAQABAoIBAQClGdzMf0tpt1Zg
+  O9FXzJI032jrrtBXw6PDk+UTHOsCirsLcm7UDliBnX8WmCSO5aiaKev0K4iYR0lF
+  VRJN3We95OVkOmm0YsIGK5+Sv+GJNFv1BaQJTQZH1zDOkX9cwsvRmGbza6NVZbAb
+  XPIg9ctKiHNgMvfhupakpUCxI8EdcWUkTAXy7YNR7FxQcrgtRL7ebvB87wJExzNE
+  M0KHcYO2f2OExb5owshGqy7ek7uk3cslZgqRzhYqwXyRc2kRAGqCpCsdEop4dTAM
+  ygh+v1KyXmCaUYPJ8F+k740GR9KTuvGlQQBPnj1ANgFmSyfeT5n4Gd/WgQ9wLcIA
+  o1yNoV8xAoGBAPagbk2Jnn8OnCj0Bnlkruf9p2aoISR3dCUBG9aG8LSTg+XfMiBL
+  Ip18y7/HpoV0EKTn/fXY58Zxwe63+I0qVM6Y155oCCwg/F1SQGLLsoqrbf++qBcr
+  L+MH1zDl43+WUn0tnOd0WBs0WkL52HrX352Ew1oMiiOi3Cg+FWdowrfdAoGBAOzi
+  u3psneAyBce6FQqlduKakZOR6bi9gcmoNZ4ybywBXjYNW1YTg5GN9FLQLZKsESyc
+  pau06hmqYF6b2GxscIn+8MjvC5LHN4rupp9jKsBl4e50Pr4L/KwZdvxJiEDMXrrO
+  XaTXMg1YgDhSrJzrI1+5M+HIsOvvMJzhZyuX6pvFAoGAe4LK2tAB7VWuxR+4olDW
+  +13f2Rx4RKACLYoJm/1GTNjXpGaL3vph4oceLvRYo9sFfuCkIdw37v0Hh3rg4imC
+  AVkwGqe0+Ayo9j97+T5UMvg5hWvBGKFLQSKrFVT8AuiQdRpDyvJMMYudbI9dZ9/2
+  oBdeEhnXkJM+OHUnGPuxEI0CgYAaEHyGZOseHwLpzfzAtiIVnuJDtXtc+2ULdjmo
+  FW6MDf56vg99shn46wCmGAfbqpkdKoNEGFzlxAxkfItcqrXbSTTfNwYz+T2QSOAG
+  i5fJoawxW5MHwDPmD8s6yTB3yMTnkwtUtuTn+QPqrpYVkf3La4pc3oMxApl7uYVr
+  k4SZ7QKBgBhfucDxu7E+xpeV4L9bX4WAk7VeEqR029XvA/UAtQtWab2YyuwwBfU4
+  31QuBY93NR7ETDiN+meED0W4r6w0Ekml84/fBKi5g5Fca+MtNPKHwX/1ZvAfctT/
+  hK2AdQk+3uqwrknwuNrx8tbeZonPTwiN98m/2JgrnWZ816uAQlul
+  -----END RSA PRIVATE KEY-----
+role: '<%=answer.role%>'
+
+
+# PLATFORM: CLOUD
+domaincloudID: vpc-0123456789 #this needs to be internal to something and set each time the domain is created
+platform: aws  #this needs to be internal so that each platform type for a node can be rendered against
+renderedurl: https://s3-eu-west-1.amazonaws.com/stevenorledge/rendered/<%=config.platform%>/<%=node.name%>/
+nodescripturl: <%= config.renderedurl %>deployment/main.sh
+
+
+# 
+# NETWORKS
+# 
+domain: '<%= answer.domain %>'
 
 domainnetwork: '10.10.0.0'
 domainnetmask: '255.255.0.0'
 
-searchdomains: "<%=config.networks.pri.domain%> <%=config.domainname%>"
-#internaldns: "10.10.31.254"
-internaldns: "10.10.0.2" #hack for aws
+internaldns: 10.10.0.1
+searchdomains: "<%= config.networks.network1.domain %> <%= config.domain %>"
 
 networks:
-  pri:
+  network1:
     defined: true
-    interface: "eth0"
-    hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domainname %>"
-    domain: "pri"
-    short_hostname: "<%= node.name %>.<%= config.networks.pri.domain %>"
+    domain:  'pri'
+    interface: 'em1'
+    short_hostname: '<%= node.name %>.<%= config.networks.network1.domain %>'
+    hostname: '<%= config.networks.network1.short_hostname %>.<%= config.domain %>' 
     ip: "10.10.<%= node.group.index %>.<%= node.index.to_i + 100 %>"
-    netmask: "255.255.224.0"
-    network: "10.10.0.0"
-    gateway: "10.10.0.1"
+    netmask: 255.255.224.0
+    network: 10.10.0.0 
+    gateway: 10.10.0.1
+    cloudID: subnet-12345678987654321   #this needs to be internal to something and set each time the domain is created
     primary: true
-    named_fwd_zone: "<%= config.networks.pri.domain %>.<%= config.domainname %>"
-    named_rev_zone: <% split_net = config.networks.pri.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
-    firewalldzone: trusted
-    pxefilename: '<%= `gethostip -x #{config.networks.pri.ip}` %>'
-
-  mgt:
-    defined: true
-    interface: "eth1"
-    hostname: "<%= config.networks.mgt.short_hostname %>.<%= config.domainname %>"
-    domain: "mgt"
-    short_hostname: "<%= node.name %>.<%= config.networks.mgt.domain %>"
+  network2:
+    defined: <%= answer.network2_defined %>
+    domain: 'mgt' 
+    interface: 'em2'
+    short_hostname: '<%= node.name %>.<%= config.networks.network2.domain %>'
+    hostname: '<%= config.networks.network2.short_hostname %>.<%= config.domain %>' 
     ip: "10.10.<%= node.group.index.to_i + 32 %>.<%= node.index.to_i + 100 %>"
-    netmask: "255.255.224.0"
-    network: "10.10.32.0"
-    gateway:
-    named_fwd_zone: "<%= config.networks.mgt.domain %>.<%= config.domainname %>"
-    named_rev_zone: <% split_net = config.networks.mgt.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
-    firewalldzone: trusted
-
-  ib:
-    defined: true
-    interface: "eth2"
-    hostname: "<%= config.networks.ib.short_hostname %>.<%= config.domainname %>"
-    domain: "ib"
-    short_hostname: "<%= node.name %>.<%= config.networks.ib.domain %>"
+    netmask: 255.255.224.0
+    network: 10.10.32.0
+    cloudID: subnet-12345678987654321   #this needs to be internal to something and set each time the domain is created
+  network3:
+    defined: <%= answer.network3_defined %>
+    domain: 'ib' 
+    interface: 'ib0'
+    short_hostname: '<%= node.name %>.<%= config.networks.network3.domain %>'
+    hostname: '<%= config.networks.network3.short_hostname %>.<%= config.domain %>' 
     ip: "10.10.<%= node.group.index.to_i + 64 %>.<%= node.index.to_i + 100 %>"
-    netmask: "255.255.224.0"
-    network: "10.10.64.0"
-    gateway:
-    named_fwd_zone: "<%= config.networks.ib.domain %>.<%= config.domainname %>"
-    named_rev_zone: <% split_net = config.networks.ib.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
-    firewalldzone: trusted
+    netmask: 255.255.224.0
+    network: 10.10.64.0
+    cloudID: subnet-12345678987654321   #this needs to be internal to something and set each time the domain is created
 
-role: '<%=answer.role%>'
-
-
-debug: true
-platform: aws
-renderedurl: https://s3-eu-west-1.amazonaws.com/stevenorledge/rendered/<%=config.platform%>/<%=node.name%>/
-nodescripturl: <%= config.renderedurl %>deployment/main.sh
-
-# SHA512 - generate with `python -c 'import crypt,getpass;pw=getpass.getpass();print(crypt.crypt(pw) if (pw==getpass.getpass("Confirm: ")) else exit())'`
-rootpw: $6$4nGtQTx8OApHDlaR$AtoY1iyieO7.jlyPYuq4YMI/QeBQFVWS/VT.hiCFmff3UkalLLwRh2.hrjuQ0v5dX2jivKntLHMwqvbmPy2BM.
-
-privatekey: |
-  -----BEGIN RSA PRIVATE KEY-----
-  MIIEpAIBAAKCAQEArT0I9vGv90JPeVz0fUwm/YxwGShwZppM6uEfPGn/VbPtHcLE
-  GPsqaImAGgwQFfl1COf8sXpbPFxL4XAnBNDxD+FE/SCOQV8Teps0uca5bkQ5kjP9
-  7ODW1T87oRCKt1KzbpN1oedH+tTMZ3bACC0Z5EmyXY0KdTeZ/Njz0XJdaeEJvsrH
-  D0lktGEAqpaSABVYcUskyT7yZZ+bA+Lf4/ynVhV9z4h3A4XP5y49lx/WI35Y7vse
-  0bNRkcSzFXdw/IacoE633+PhuNZFmU4eJ21YwZ8lGoVAwphs0ZmgZcUK6QTWVRlR
-  WPQZYxGP73OMJnWFNhJFaEZGjWbawz5RKOQPcQIDAQABAoIBACCDcAdI3Qm+/EN+
-  2rQZcsfrb66JFG9tTjpW/hHMowtmtX38a+l0WkU8aTp6QRqeswR05cw5dp4hhGxP
-  LEOPI28jjFslnQ1P1swQDRlA3tR/IX77GxE2MZvcPkjAXgiCEQMT0eQNEElXXvWc
-  J/Zg4Jcj7cH5EpllUhVOcpRArp+MOXwgsnVoogxqR+H6hTgzPs044KP092odXTIJ
-  cCYEo4uNbWlWNOYF/GpjDGYxC4ZGP86DKx9dvjLqz4XUKAxzqpxT1HOfvwdDt383
-  SJeEP2zScWdrxzMeY/usPPmVwXt7TnKN3hc2jMezQQsXW1hP0P/y7l+q36yaTFee
-  c4iUH0ECgYEA5Y8MvyVgIuyHWQwVgCgrkHK55HA0T8oERM3u8Woz9dI1XulUJ8EL
-  EZ8CcrwRNe56qFaUm5g5DlGbVNF2Uc49kO7iNrZzEPSU3qAXbLi4oXR99Wxsi9+d
-  75r7cDAXMEQh4ZUScmQCvg7/tjraVj1OvQsXdD0VxXz9RVinrAI1JL0CgYEAwTFH
-  V8q15tj+R4p5Qr0t/ERW2ljCIsB4opC53AFNSAfkmKOxpAFmS7gn/PKWX8i/9m2M
-  BnXROn7UUS6IM2X8o8tuUeLWvnjFodraHu8QJhZk6DYFwPsr9aLXSSW4nO23NWXx
-  C6QCLH5xvcRodRsewy16j4MT4RCJswOhfEtnksUCgYAM8xnj+obG0ZL9Cfp4hUuX
-  1XD5Gv9IdPvyqa9N/RC7UEVkekMeDvzB3Ld1o3hRE4fl0SSG9npZfW8GxN4o1TqR
-  33fxYC9ziGiRenR31J/Ns9WbL6eb6FxvdM20UXItbdp/cDpfK5cgA5aXQBCrBsBX
-  V7XV/9AnmNpsvAiRYnp+/QKBgQCywodSG7a++TAoQGA9udDwKMf418Ii59d4DNR9
-  VxMMQIlsF6OKruTZ0Xfm3Qz5akb9nZXAcIn+R1bsG1NZw9fGM7lLucqciiHMxzWn
-  A+v8YiJSn5IpY//kFR6Bh47QXkF0/nPRIpwEUaerQS6qlUKctNtAKbheO7A+XXCy
-  Ew+uRQKBgQCsm3sQO39vPhBNQyT6aJyI/U/Tpbm+qVYZ8N1o4+TbsswoWHSUfKQi
-  qzeD8sqRSrP6W8tk8l+OoG+WuAevpU5itjAseHiTbmT7yE3T/TtT12JTgPpIP1OY
-  S6kRdR4lYvh0EZamGDtt/Kz2uHdOJdHJyM1qAnu8fdZbogReFexXPw==
-  -----END RSA PRIVATE KEY-----
-
-publickey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtPQj28a/3Qk95XPR9TCb9jHAZKHBmmkzq4R88af9Vs+0dwsQY+ypoiYAaDBAV+XUI5/yxels8XEvhcCcE0PEP4UT9II5BXxN6mzS5xrluRDmSM/3s4NbVPzuhEIq3UrNuk3Wh50f61MxndsAILRnkSbJdjQp1N5n82PPRcl1p4Qm+yscPSWS0YQCqlpIAFVhxSyTJPvJln5sD4t/j/KdWFX3PiHcDhc/nLj2XH9Yjflju+x7Rs1GRxLMVd3D8hpygTrff4+G41kWZTh4nbVjBnyUahUDCmGzRmaBlxQrpBNZVGVFY9BljEY/vc4wmdYU2EkVoRkaNZtrDPlEo5A9x
-
-#EXAMPLE COMPLEX
-#networks:
-#  pri:
-#    interface: bond0
-#    ip: 10.10.0.<%= node.index + 10 %>
-#    bridge:
-#      interface: pri
-#      slave_interfaces:
-#        - bond0
-#    bond:
-#      interface: bond0
-#      slave_interfaces:
-#        - em1
-#        - em3
-#      options: 'mode=1 primary=em1 miimon=80'
-#  mgt:
-#    interface: mgt
-#    ip: 10.11.0.<%= node.index + 10 %>
-#    bridge:
-#      interface: mgt
-#      slave_interfaces:
-#        - bond0.11
-#  ib:
-#    ip: 10.12.0.<%= node.index + 10 %>
-#  bmc:
-#    ip: "10.11.10.<%= node.index + 10 %>"
-#  ext:
-#    defined: true
-#    domain: ext
-#    ip: 10.101.100.<%= node.index + 10 %>
-#    network: 10.101.0.0
-#    netmask: 255.255.0.0
-#    gateway: 10.101.0.1
-#    short_hostname: <%= node.name %>.<%= config.networks.ext.domain %>
-#    interface: ext
-#    firewallpolicy: external
-#    bridge:
-#      interface: ext
-#      slave_interfaces:
-#        - em2
+external:
+  defined: <%= if config.role == 'login' then true else false end %>
