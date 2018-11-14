@@ -225,4 +225,10 @@ Outputs:
   <%=node.name%>ID:
     Description: <%=node.name%>ID
     Value: !Ref <%=node.name%>
+<% #if node.config.role == 'login' -%>
+  <%=node.name%>IP:
+    Description: <%=node.name%>IP
+    Value: !Ref <%=node.name%>publicIp
+<% #end -%>
 <% end -%>
+
