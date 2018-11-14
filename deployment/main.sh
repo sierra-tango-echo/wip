@@ -9,7 +9,7 @@ export -f info
 
 <% if (config.debug rescue false) -%>
 info "Setting root password"
-echo 'root:<%=config.rootpw%>' | chpasswd -e
+echo 'root:<%= config.root_password %>' | chpasswd -e
 <% end -%>
 
 info "Running cloudimage"

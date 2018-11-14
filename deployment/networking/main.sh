@@ -19,8 +19,8 @@ systemctl stop firewalld
 ##
 
 ##Basic Networking
-echo "HOSTNAME=<%= config.networks.pri.hostname %>" >> /etc/sysconfig/network
-echo "<%= config.networks.pri.hostname %>" > /etc/hostname
+echo "HOSTNAME=<%= config.networks.network1.hostname %>" >> /etc/sysconfig/network
+echo "<%= config.networks.network1.hostname %>" > /etc/hostname
 
 cat << EOF > /etc/resolv.conf
 search <%= config.searchdomains %>
