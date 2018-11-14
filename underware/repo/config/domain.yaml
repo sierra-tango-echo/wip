@@ -8,7 +8,7 @@ domainnetwork: '10.10.0.0'
 domainnetmask: '255.255.0.0'
 domaincloudID: vpc-0d0361238a6101000  #this needs to be internal to something and set each time the domain is created
 
-searchdomains: "<%=config.networks.pri.domain%> <%=config.domaininame%>"
+searchdomains: "<%=config.networks.pri.domain%> <%=config.domainname%>"
 internaldns: "10.10.31.254"
 
 
