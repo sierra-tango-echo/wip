@@ -4,10 +4,11 @@ OUTPUTBASE=$DIR/rendered/
 
 #aws
 mkdir -p $OUTPUTBASE/aws/orchestration/
-underware render $DIR/orchestration/aws/main.yaml > $OUTPUTBASE/aws/orchestration/main.yaml
+underware render $DIR/orchestration/aws/everythinginone/main.yaml > $OUTPUTBASE/aws/orchestration/main.yaml
+underware render $DIR/orchestration/aws/seperate_domain_and_nodes/domain.yaml > $OUTPUTBASE/aws/orchestration/domain.yaml
 nodeattr -n all | while read NODE; do
   mkdir -p $OUTPUTBASE/aws/$NODE/
-#  underware render $DIR/orchestration/aws/machine.yaml > $OUTPUTBASE/aws/$NODE/orchestration.yaml $NODE
+  underware render $DIR/orchestration/aws/seperate_domain_and_nodes/node.yaml > $OUTPUTBASE/aws/$NODE/orchestration.yaml $NODE
   cd $DIR
   find deployment/ | while read f; do 
     if [ -f $f ]; then 
