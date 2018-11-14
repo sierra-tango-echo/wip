@@ -194,9 +194,9 @@ Resources:
               - "hostname: <%=name%>\n"
               - "fqdn: <%=node.config.networks.pri.hostname%>\n"
               - "runcmd:\n"
-              - "  - curl <%= node.config.nodescripturl %> | /bin/bash | tee /tmp/mainscript-default-output\n"
+              - "  - curl <%= node.config.nodescripturl %> | /bin/bash -x | tee /tmp/mainscript-default-output\n"
 
-<% if node.config.role == 'login' -%>
+<% #if node.config.role == 'login' -%>
   <%=node.name%>publicIp:
     Type: AWS::EC2::EIP
     Properties:
@@ -207,7 +207,7 @@ Resources:
     Properties:
       NetworkInterfaceId: !Ref <%=node.name%>priInterface
       AllocationId: !GetAtt <%=node.name%>publicIp.AllocationId
-<% end -%>
+<% #end -%>
 <% end -%>
 
 Outputs:

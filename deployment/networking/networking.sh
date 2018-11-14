@@ -1,5 +1,6 @@
 #!/bin/bash
 #(c)2018 Alces Flight Ltd. HPC Consulting Build Suite
+CONFIGDIR='/etc/sysconfig/network-scripts/'
 <% config.networks.each do |name, network| %>
 <% if network.defined %>
 cat << EOF > "${CONFIGDIR}ifcfg-<%=network.interface%>"

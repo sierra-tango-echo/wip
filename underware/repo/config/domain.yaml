@@ -8,8 +8,8 @@ domainnetwork: '10.10.0.0'
 domainnetmask: '255.255.0.0'
 
 searchdomains: "<%=config.networks.pri.domain%> <%=config.domainname%>"
-internaldns: "10.10.31.254"
-
+#internaldns: "10.10.31.254"
+internaldns: "10.10.0.2" #hack for aws
 
 networks:
   pri:
