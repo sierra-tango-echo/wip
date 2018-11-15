@@ -1,0 +1,124 @@
+<%
+require 'ipaddr'
+def to_cidr(network,netmask)
+  "#{network.to_s}/#{IPAddr.new(netmask.to_s).to_i.to_s(2).count('1')}" rescue "#{network.to_s}/#{netmask.to_s}"
+end
+-%>
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "<%=config.cluster%>network",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "<%=to_cidr(config.domainnetwork,config.domainnetmask)%>"
+          ]
+        },
+        "subnets": [
+<% subnets=[]; config.networks.each do |networkname,network|
+  if network.defined && !(network.dhcp)
+    s=<<EOF
+          {
+            "name": "#{config.cluster}#{networkname}",
+            "properties": {
+              "addressPrefix": "#{to_cidr(network.network,network.netmask)}"
+            }
+          }
+EOF
+    subnets << s
+  end
+end-%>
+<%=subnets.join(',')%>
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "<%=config.cluster%>securitygroup",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [{
+           "name": "inbound-ssh",
+             "properties": {
+             "protocol": "TCP",
+             "sourcePortRange": "*",
+             "destinationPortRange": "22",
+             "sourceAddressPrefix": "213.83.69.6/32",
+             "destinationAddressPrefix": "*",
+             "access": "Allow",
+             "priority": 1000,
+             "direction": "Inbound"
+           }
+         }]
+       }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "<%=config.cluster%><%=node.name%>pubIP",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static",
+        "idleTimeoutInMinutes": 30,
+        "dnsSettings": {
+          "domainNameLabel": "<%=config.cluster%>-<%=node.name%>"
+        }
+      }
+    },
+<% interfaces=[]; node.config.networks.each do |networkname,network| -%>
+<%  if network.defined && !(network.dhcp) -%>
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "<%=config.cluster%><%=node.name%><%=networkname%>interface",
+      "apiVersion": "2017-03-01",
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "location": "[resourceGroup().location]",
+        "properties": {
+          "ipConfigurations": [{
+            "name": "<%=config.cluster%><%=node.name%><%=networkname%>ip",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "<%=network.ip%>",
+<% if network.isprimary -%>
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', '<%=config.cluster%><%=node.name%>pubIP')]"
+              },
+<% end -%>
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', '<%=config.cluster%><%=networkname%>')]"
+              }
+            }
+          }],
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
+           }
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
+        ]
+    }
+  <% end -%>
+<% end -%>
+  ]
+}
