@@ -14,3 +14,6 @@ sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/g' /etc/ssh/sshd
 systemctl restart sshd
 #Disable cloudinit on future boots
 touch /etc/cloud/cloud-init.disabled
+
+echo "StrictHostKeyChecking no" >> /root/.ssh/config
+chmod 600 /root/.ssh/config

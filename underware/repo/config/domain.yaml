@@ -7,21 +7,23 @@ domainname: '<%= answer.domainname %>'
 domainnetwork: '10.10.0.0'
 domainnetmask: '255.255.0.0'
 
-searchdomains: "<%=config.networks.pri.domain%> <%=config.domainname%>"
-#internaldns: "10.10.31.254"
-internaldns: "10.10.0.2" #hack for aws
+
+#controller appliance
+controllernetworking: false
+controllersearchdomains: "<%=config.networks.pri.domain%> <%=config.domainname%>"
+conttollerdns: "10.10.31.254"
 
 networks:
   pri:
     defined: true
-    interface: "eth0"
+    interface: "enp0s3"
     hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domainname %>"
     domain: "pri"
     short_hostname: "<%= node.name %>.<%= config.networks.pri.domain %>"
     ip: "10.10.<%= node.group.index %>.<%= node.index.to_i + 100 %>"
     netmask: "255.255.224.0"
     network: "10.10.0.0"
-    gateway: "10.10.0.1"
+    gateway: 
     primary: true
     named_fwd_zone: "<%= config.networks.pri.domain %>.<%= config.domainname %>"
     named_rev_zone: <% split_net = config.networks.pri.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
@@ -30,7 +32,7 @@ networks:
 
   mgt:
     defined: true
-    interface: "eth1"
+    interface: "enp0s8"
     hostname: "<%= config.networks.mgt.short_hostname %>.<%= config.domainname %>"
     domain: "mgt"
     short_hostname: "<%= node.name %>.<%= config.networks.mgt.domain %>"
@@ -44,7 +46,7 @@ networks:
 
   ib:
     defined: true
-    interface: "eth2"
+    interface: "enp0s9"
     hostname: "<%= config.networks.ib.short_hostname %>.<%= config.domainname %>"
     domain: "ib"
     short_hostname: "<%= node.name %>.<%= config.networks.ib.domain %>"
@@ -56,11 +58,17 @@ networks:
     named_rev_zone: <% split_net = config.networks.ib.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
     firewalldzone: trusted
 
+  ext:
+    defined: true
+    interface: "enp0s10"
+    dhcp: true
+    dhcpinfo: true
+
 role: '<%=answer.role%>'
 
 
 debug: true
-platform: aws
+platform: virtualbox
 renderedurl: https://s3-eu-west-1.amazonaws.com/stevenorledge/rendered/<%=config.platform%>/<%=node.name%>/
 nodescripturl: <%= config.renderedurl %>deployment/main.sh
 

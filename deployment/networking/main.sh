@@ -22,9 +22,11 @@ systemctl stop firewalld
 echo "HOSTNAME=<%= config.networks.pri.hostname %>" >> /etc/sysconfig/network
 echo "<%= config.networks.pri.hostname %>" > /etc/hostname
 
+<% if (config.controllernetworking rescue false) || false -%>
 cat << EOF > /etc/resolv.conf
 search <%= config.searchdomains %>
 nameserver <%= config.internaldns %>
 EOF
+<% end -%>
 ##
 

@@ -61,7 +61,7 @@ Resources:
           Value: <%=config.cluster%>
   
 <% config.networks.each do |networkname,network|-%>
-<% if network.defined -%>
+<% if network.defined && !(network.dhcp)  -%>
 
   <%=name%><%=networkname%>Subnet:
     Type: AWS::EC2::Subnet

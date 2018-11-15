@@ -1,5 +1,6 @@
 CENTOS7IMAGE=/Users/steve/iso/centos7.vdi
 EXTERNALBRIDGEADAPTER=en0
+CONSOLE=0
 
 VMPATH=/tmp/alcesvm/<%=node.name%>/
 
@@ -54,7 +55,9 @@ VBoxManage modifyvm <%=node.name%> --nic<%=nets%> intnet --intnet<%=nets%> "<%=n
 #add external network
 VBoxManage modifyvm <%=node.name%> --nic4 bridged --bridgeadapter4 $EXTERNALBRIDGEADAPTER
 
-VBoxManage modifyvm <%=node.name%> --uart1 0x3F8 4 --uartmode1 server $VMPATH/${VMNAME}pipe
+if [ "$CONSOLE" -gt 0 ]; then
+  VBoxManage modifyvm <%=node.name%> --uart1 0x3F8 4 --uartmode1 server $VMPATH/${VMNAME}pipe
+fi
 VBoxManage storagectl <%=node.name%> --name "SATA" --add sata --portcount 2
 
 #resize the volume to something more appropriate

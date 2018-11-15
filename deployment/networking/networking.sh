@@ -15,10 +15,19 @@ TYPE='Infiniband'
 <% else -%>
 TYPE='Ethernet'
 <% end -%>
+<% if network.dhcp -%>
+BOOTPROTO=dhcp
+<% else -%>
 BOOTPROTO=none
+<% end -%>
 DEFROUTE=yes
+<% if network.dhcpinfo -%>
+PEERDNS=yes
+PEERROUTES=yes
+<% else -%>
 PEERDNS=no
 PEERROUTES=no
+<% end -%>
 IPV4_FAILURE_FATAL=no
 IPV6INIT=no
 IPV6_AUTOCONF=yes
@@ -29,8 +38,10 @@ IPV6_FAILURE_FATAL=no
 NAME=<%=network.interface%>
 DEVICE=<%=network.interface%>
 ONBOOT=yes
+<% if ! network.dhcp -%>
 IPADDR=<%=network.ip%>
 NETMASK=<%=network.netmask%>
+<% end -%>
 ZONE=trusted
 <% if (config.platform == 'aws' rescue false) -%>
 MTU="9001"
@@ -38,8 +49,10 @@ MTU="9001"
 <% if network.interface.match(/\.\d+$/)-%>
 VLAN=yes
 <%end-%>
+<% if ! network.dhcpinfo -%>
 <% if ! (network.gateway.to_s.empty? rescue true) -%>
 GATEWAY=<%=network.gateway%>
+<% end -%>
 <% end -%>
 EOF
 <% (network.bridge.slave_interfaces rescue []).each do |slaveinterface| -%>
