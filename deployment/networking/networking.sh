@@ -32,7 +32,7 @@ ONBOOT=yes
 IPADDR=<%=network.ip%>
 NETMASK=<%=network.netmask%>
 ZONE=trusted
-<% if (config.aws || rescue false) -%>
+<% if (config.platform == 'aws' rescue false) -%>
 MTU="9001"
 <% end -%>
 <% if network.interface.match(/\.\d+$/)-%>
@@ -63,7 +63,7 @@ ONBOOT=yes
 NAME=<%=slaveinterface%>
 DEVICE=<%=slaveinterface%>
 BRIDGE=<%=network.bridge.interface%>
-<% if (config.aws || rescue false) -%>
+<% if (config.platform == 'aws' rescue false) -%>
 MTU="9001"
 <% end -%>
 <%if slaveinterface.match(/\.\d+$/)-%>
@@ -89,7 +89,7 @@ ONBOOT=yes
 NAME=<%=slaveinterface%>
 DEVICE=<%=slaveinterface%>
 MASTER=<%=network.bond.interface%>
-<% if (config.aws || rescue false) -%>
+<% if (config.platform == 'aws' rescue false) -%>
 MTU="9001"
 <% end -%>
 <%if slaveinterface.match(/\.\d+$/)-%>

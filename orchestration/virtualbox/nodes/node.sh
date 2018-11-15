@@ -1,8 +1,9 @@
-VMBASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 CENTOS7IMAGE=/Users/steve/iso/centos7.vdi
+EXTERNALBRIDGEADAPTER=en0
 
+VMPATH=/tmp/alcesvm/<%=node.name%>/
 
-VMPATH=$VMBASE/<%=node.name%>
+mkdir -p $VMPATH
 
 #STOP SHIT FIRST
 VBoxManage controlvm <%=node.name%> poweroff
@@ -45,13 +46,13 @@ VBoxManage createvm --name <%=node.name%> --ostype RedHat_64 --register --basefo
 VBoxManage modifyvm <%=node.name%> --cpus 2 --memory 4096 --vrde on --vrdeport 5001 
 
 <% nets=1 -%>
-<% node.networks.each do |name,network| -%>
-VBoxManage modifyvm $VMNAME --nic<%=nets%> intnet --intnet<%=nets%> "<%=name%>"
+<% node.config.networks.each do |name,network| -%>
+VBoxManage modifyvm <%=node.name%> --nic<%=nets%> intnet --intnet<%=nets%> "<%=name%>"
 <% nets+=1 -%>
 <% end -%>
 
 #add external network
-VBoxManage modifyvm $VMNAME --nic4 bridged --bridgeadapter4 en0
+VBoxManage modifyvm <%=node.name%> --nic4 bridged --bridgeadapter4 $EXTERNALBRIDGEADAPTER
 
 VBoxManage modifyvm <%=node.name%> --uart1 0x3F8 4 --uartmode1 server $VMPATH/${VMNAME}pipe
 VBoxManage storagectl <%=node.name%> --name "SATA" --add sata --portcount 2
