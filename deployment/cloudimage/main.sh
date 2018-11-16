@@ -1,7 +1,13 @@
 #!/bin/bash
 #(c)2018 Alces Flight Ltd. HPC Consulting Build Suite
 
+<% if config.platform != "azure" -%>
 #Undo cloudinit stuff
+#Disable cloudinit on future boots
+touch /etc/cloud/cloud-init.disabled
+<%end-%>
+
+
 mkdir -p /root/.ssh
 chmod 600 /root/.ssh
 echo <%= config.publickey %> > /root/.ssh/authorized_keys
@@ -12,8 +18,6 @@ chmod 600 /root/.ssh/id_rsa
 chmod 600 /root/.ssh/authorized_keys
 sed -i 's/^PasswordAuthentication.*$/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 systemctl restart sshd
-#Disable cloudinit on future boots
-touch /etc/cloud/cloud-init.disabled
 
 echo "StrictHostKeyChecking no" >> /root/.ssh/config
 chmod 600 /root/.ssh/config

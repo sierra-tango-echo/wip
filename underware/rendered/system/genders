@@ -3,6 +3,6 @@
 # this file between the UNDERWARE_START and UNDERWARE_END markers may be lost;
 # you should make any changes you want to persist outside of this section or to
 # the template directly.
-login01    login,mycluster,all
+logging01    login,mycluster,all
 node[01-03]    nodes,compute,mycluster,all
 ########## UNDERWARE_END ##########

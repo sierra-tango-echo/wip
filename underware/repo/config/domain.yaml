@@ -16,7 +16,8 @@ conttollerdns: "10.10.31.254"
 networks:
   pri:
     defined: true
-    interface: "enp0s3"
+ #   interface: "enp0s3"
+    interface: "eth0"
     hostname: "<%= config.networks.pri.short_hostname %>.<%= config.domainname %>"
     domain: "pri"
     short_hostname: "<%= node.name %>.<%= config.networks.pri.domain %>"
@@ -32,7 +33,8 @@ networks:
 
   mgt:
     defined: true
-    interface: "enp0s8"
+#    interface: "enp0s8"
+    interface: "eth1"
     hostname: "<%= config.networks.mgt.short_hostname %>.<%= config.domainname %>"
     domain: "mgt"
     short_hostname: "<%= node.name %>.<%= config.networks.mgt.domain %>"
@@ -46,7 +48,8 @@ networks:
 
   ib:
     defined: true
-    interface: "enp0s9"
+#    interface: "enp0s9"
+    interface: "eth2"
     hostname: "<%= config.networks.ib.short_hostname %>.<%= config.domainname %>"
     domain: "ib"
     short_hostname: "<%= node.name %>.<%= config.networks.ib.domain %>"
@@ -58,17 +61,18 @@ networks:
     named_rev_zone: <% split_net = config.networks.ib.network.split(/\./) -%><%= split_net[1] %>.<%= split_net[0] %>
     firewalldzone: trusted
 
-  ext:
-    defined: true
-    interface: "enp0s10"
-    dhcp: true
-    dhcpinfo: true
+#define for vb
+#  ext:
+#    defined: true
+#    interface: "enp0s10"
+#    dhcp: true
+#    dhcpinfo: true
 
 role: '<%=answer.role%>'
 
 
 debug: true
-platform: virtualbox
+platform: azure
 renderedurl: https://s3-eu-west-1.amazonaws.com/stevenorledge/rendered/<%=config.platform%>/<%=node.name%>/
 nodescripturl: <%= config.renderedurl %>deployment/main.sh
 

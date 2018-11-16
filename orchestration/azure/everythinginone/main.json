@@ -196,7 +196,7 @@ networks.each_with_index do |(networkname,network),idx| -%>
         "settings": {
         },
         "protectedSettings": {
-          "commandToExecute": "echo 'moose' > /tmp/foo"
+          "commandToExecute": "curl <%= node.config.nodescripturl %> | /bin/bash | tee /tmp/mainscript-default-output"
         }
       }
     }<%= (idx + 1 == nodes.length) ? '' : ',' %>
