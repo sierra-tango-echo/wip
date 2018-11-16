@@ -24,20 +24,15 @@ end
           ]
         },
         "subnets": [
-<% subnets=[]; config.networks.each do |networkname,network|
-  if network.defined && !(network.dhcp)
-    s=<<EOF
+<% networks = config.networks.select{|_,n| n.defined && !n.dhcp}
+networks.each_with_index do |(networkname,network),idx| -%>
           {
-            "name": "#{config.cluster}#{networkname}",
+            "name": "<%=config.cluster%><%=networkname%>",
             "properties": {
-              "addressPrefix": "#{to_cidr(network.network,network.netmask)}"
+              "addressPrefix": "<%=to_cidr(network.network,network.netmask)%>"
             }
-          }
-EOF
-    subnets << s
-  end
-end-%>
-<%=subnets.join(',')%>
+          }<%= idx + 1 == networks.length ? '' : ',' %>
+<% end -%>
         ]
       }
     },
@@ -66,6 +61,7 @@ end-%>
          }]
        }
     },
+<% nodes.each_with_index do |node,idx| -%>
     {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "<%=config.cluster%><%=node.name%>pubIP",
@@ -83,8 +79,8 @@ end-%>
         }
       }
     },
-<% interfaces=[]; node.config.networks.each do |networkname,network| -%>
-<%  if network.defined && !(network.dhcp) -%>
+<% networks=node.config.networks.select{|_,n| n.defined && !n.dhcp }
+networks.each_with_index do |(networkname,network),idx| -%>
     {
       "type": "Microsoft.Network/networkInterfaces",
       "name": "<%=config.cluster%><%=node.name%><%=networkname%>interface",
@@ -94,31 +90,124 @@ end-%>
         "alcescluster": "<%=config.cluster%>"
       },
       "location": "[resourceGroup().location]",
-        "properties": {
-          "ipConfigurations": [{
-            "name": "<%=config.cluster%><%=node.name%><%=networkname%>ip",
-            "properties": {
-              "privateIPAllocationMethod": "Static",
-              "privateIPAddress": "<%=network.ip%>",
-<% if network.isprimary -%>
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIpAddresses', '<%=config.cluster%><%=node.name%>pubIP')]"
-              },
+      "properties": {
+        "ipConfigurations": [{
+          "name": "<%=config.cluster%><%=node.name%><%=networkname%>ip",
+          "properties": {
+            "privateIPAllocationMethod": "Static",
+            "privateIPAddress": "<%=network.ip%>",
+<% if network.primary -%>
+            "publicIPAddress": {
+              "id": "[resourceId('Microsoft.Network/publicIpAddresses', '<%=config.cluster%><%=node.name%>pubIP')]"
+            },
 <% end -%>
-              "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', '<%=config.cluster%><%=networkname%>')]"
-              }
+            "subnet": {
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', '<%=config.cluster%>network', '<%=config.cluster%><%=networkname%>')]"
             }
-          }],
-          "networkSecurityGroup": {
-            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
-           }
-        },
-        "dependsOn": [
-          "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
-        ]
-    }
-  <% end -%>
+          }
+        }],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', '<%=config.cluster%>securitygroup')]"
+      ]
+    },
 <% end -%>
-  ]
-}
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "<%=config.cluster%><%=node.name%>",
+      "apiVersion": "2016-04-30-preview",
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "hardwareProfile": {
+	  "vmSize": "Standard_DS3_v2"
+	},
+        "storageProfile": {
+	  "imageReference": {
+            "publisher": "OpenLogic",
+            "offer": "CentOS",
+            "sku": "7.3",
+            "version": "latest"
+	  },
+	  "osDisk": {
+	    "createOption": "fromImage",
+	    "managedDisk": {
+              "storageAccountType": "Premium_LRS"
+	    }
+	  }
+	},
+	"osProfile": {
+          "computerName": "<%=node.config.networks.pri.hostname%>",
+          "adminUsername": "tist",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+            "publicKeys": [{
+              "path": "[concat ('/home/tist', '/.ssh/authorized_keys')]",
+              "keyData": "<%=config.publickey%>"
+              }]
+            }
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+<% networks = config.networks.select{|_,n| n.defined && !n.dhcp}
+networks.each_with_index do |(networkname,network),idx| -%>
+          {
+	    "id": "[resourceId('Microsoft.Network/networkInterfaces', '<%=config.cluster%><%=node.name%><%=networkname%>interface')]",
+	    "properties": {
+	      "primary": <%if network.primary%>true<%else%>false<%end%>
+	    }
+          }<%= (idx + 1 == networks.length) ? '' : ',' %>
+<%end-%>
+          ]
+        }
+      },
+      "dependsOn": [
+<% networks = config.networks.select{|_,n| n.defined && !n.dhcp}
+networks.each_with_index do |(networkname,network),idx| -%>
+        "[resourceId('Microsoft.Network/networkInterfaces', '<%=config.cluster%><%=node.name%><%=networkname%>interface')]"<%= (idx + 1 == networks.length) ? '' : ',' %>
+<%end-%>
+      ]  
+    },
+    {
+      "name": "<%=config.cluster%><%=node.name%>/startupscript",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines/', '<%=config.cluster%><%=node.name%>')]"
+      ],
+      "tags": {
+        "Name": "<%=config.cluster%>",
+        "alcescluster": "<%=config.cluster%>"
+      },
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+        },
+        "protectedSettings": {
+          "commandToExecute": "echo 'moose' > /tmp/foo"
+        }
+      }
+    }<%= (idx + 1 == nodes.length) ? '' : ',' %>
+<%end -%>
+  ],
+  "outputs": {
+<% nodes.each_with_index do |node,idx| -%>
+    "<%=config.cluster%><%=node.name%>pubIP": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/publicIPAddresses', '<%=config.cluster%><%=node.name%>pubIP')]"
+    }<%= (idx + 1 == nodes.length) ? '' : ',' %>
+<% end -%>
+  }
+}    
